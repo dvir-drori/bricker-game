@@ -31,6 +31,7 @@ import java.util.Random;
  */
 public class BrickerGameManager extends GameManager {
 
+
 	// ---- window ----
 	private static final String WINDOW_TITLE  = "Bricker";
 	private static final int    WINDOW_WIDTH  = 700;
@@ -49,9 +50,9 @@ public class BrickerGameManager extends GameManager {
 	private static final int DEFAULT_BRICKS_PER_ROW = 8;
 	private static final int DEFAULT_BRICK_ROWS    = 7;
 	private static final int BRICK_HEIGHT          = 15;
-	private static final int BRICK_SPACING         = 2;
+	private static final int BRICK_SPACING         = 5;
 	private static final int BRICKS_TOP_OFFSET     = 15;
-	private static final int BRICKS_SIDE_OFFSET    = 15;
+	private static final int BRICKS_SIDE_OFFSET    = 10;
 
 	// --- pucks ---
 	private static final int PUCK_SIZE = 15;
@@ -81,12 +82,16 @@ public class BrickerGameManager extends GameManager {
 	private final int bricksPerRow;
 	private final int brickRows;
 
+	// ---- random ----
+	private Random random;
+
 	// --- references ---
 	private GameObject ball;
 	private WindowController windowController;
 	private Vector2	windowDimensions;
 	private LivesCounter livesCounter;
 	private UserInputListener inputListener;
+
 
 	// --- prompts ---
 	private static final String LOSE_PROMPT = "You lose! Play again?";
@@ -105,7 +110,7 @@ public class BrickerGameManager extends GameManager {
 		super(windowTitle, windowDimensions);
 		this.bricksPerRow = bricksPerRow;
 		this.brickRows    = brickRows;
-
+		this.random = new Random();
 	}
 
 	/**
@@ -157,13 +162,19 @@ public class BrickerGameManager extends GameManager {
 	}
 	/**
 	 * Repositions the ball at the center of the screen and gives it
-	 * a new random upward velocity.
+	 * a new random velocity.
 	 */
 	private void resetBall() {
 		ball.setCenter(windowDimensions.mult(0.5f));
-		float[] possibleX = {0, -BALL_SPEED, BALL_SPEED};
-		float velocityX = possibleX[new Random().nextInt(3)];
-		ball.setVelocity(new Vector2(velocityX, -BALL_SPEED));
+		float ballVelY = BALL_SPEED;
+		float ballVelX = BALL_SPEED;
+		if (random.nextBoolean()){
+			ballVelX *= -1;
+		}
+		if (random.nextBoolean()){
+			ballVelY *= -1;
+		}
+		ball.setVelocity(new Vector2(ballVelX, ballVelY));
 	}
 
 	/**
@@ -202,11 +213,11 @@ public class BrickerGameManager extends GameManager {
 		gameObjects().layers().shouldLayersCollide(
 				Layer.DEFAULT, Layer.STATIC_OBJECTS, true);
 
-		createBackground(imageReader, windowDimensions);
-		createWalls(windowDimensions);
-		createBall(imageReader, soundReader, windowDimensions);
-		createPaddle(imageReader, inputListener, windowDimensions);
-		createBricks(imageReader, soundReader, windowDimensions);
+		createBackground(imageReader);
+		createWalls();
+		createBall(imageReader, soundReader);
+		createPaddle(imageReader, inputListener);
+		createBricks(imageReader, soundReader);
 		this.livesCounter = new LivesCounter(MAX_LIVES);
 		createLivesDisplay(imageReader, windowDimensions);
 	}
@@ -229,10 +240,9 @@ public class BrickerGameManager extends GameManager {
 	 * Creates the background image and adds it to the BACKGROUND layer
 	 * so it is drawn behind everything else.
 	 *
-	 * @param imageReader      used to load the background image
-	 * @param windowDimensions the size of the game window
+	 * @param imageReader used to load the background image
 	 */
-	private void createBackground(ImageReader imageReader, Vector2 windowDimensions) {
+	private void createBackground(ImageReader imageReader) {
 		Renderable bgImage = imageReader.readImage(BACKGROUND_IMAGE, false);
 		GameObject background = new GameObject(Vector2.ZERO, windowDimensions, bgImage);
 		gameObjects().addGameObject(background, Layer.BACKGROUND);
@@ -241,10 +251,8 @@ public class BrickerGameManager extends GameManager {
 	/**
 	 * Creates the three invisible walls (left, right, top) that bound the playing field.
 	 * The bottom is intentionally left open so the ball can fall out (game over).
-	 *
-	 * @param windowDimensions the size of the game window
 	 */
-	private void createWalls(Vector2 windowDimensions) {
+	private void createWalls() {
 		GameObject leftWall = new GameObject(
 				Vector2.ZERO,
 				new Vector2(WALL_WIDTH, windowDimensions.y()),
@@ -267,13 +275,11 @@ public class BrickerGameManager extends GameManager {
 	 * Creates the game ball, places it at the center of the screen,
 	 * and gives it a random initial velocity that always points upward.
 	 *
-	 * @param imageReader      used to load the ball image
-	 * @param soundReader      used to load the collision sound
-	 * @param windowDimensions the size of the game window
+	 * @param imageReader used to load the ball image
+	 * @param soundReader used to load the collision sound
 	 */
 	private void createBall(ImageReader imageReader,
-							SoundReader soundReader,
-							Vector2 windowDimensions) {
+							SoundReader soundReader) {
 		Renderable ballImage   = imageReader.readImage(BALL_IMAGE, true);
 		Sound      collideSound = soundReader.readSound(COLLISION_SOUND);
 
@@ -284,31 +290,35 @@ public class BrickerGameManager extends GameManager {
 				collideSound);
 		ball.setCenter(windowDimensions.mult(0.5f));
 
-		// Random initial direction: up-left, straight up, or up-right.
-		float[] possibleX = {0, -BALL_SPEED, BALL_SPEED};
-		float velocityX = possibleX[new Random().nextInt(3)];
-		ball.setVelocity(new Vector2(velocityX, -BALL_SPEED));
-
+		// Random initial direction: up-left, up-right, down-left, down-right
+		float ballVelY = BALL_SPEED;
+		float ballVelX = BALL_SPEED;
+		if (random.nextBoolean()){
+			ballVelX *= -1;
+		}
+		if (random.nextBoolean()){
+			ballVelY *= -1;
+		}
+		ball.setVelocity(new Vector2(ballVelX, ballVelY));
 		gameObjects().addGameObject(ball);
 	}
 
 	/**
 	 * Creates the paddle and places it near the bottom of the screen.
 	 *
-	 * @param imageReader      used to load the paddle image
-	 * @param inputListener    keyboard input listener used by the paddle
-	 * @param windowDimensions the size of the game window
+	 * @param imageReader   used to load the paddle image
+	 * @param inputListener keyboard input listener used by the paddle
 	 */
 	private void createPaddle(ImageReader imageReader,
-							  UserInputListener inputListener,
-							  Vector2 windowDimensions) {
+							  UserInputListener inputListener) {
 		Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE, true);
 
 		Paddle paddle = new Paddle(
 				Vector2.ZERO,
 				new Vector2(PADDLE_WIDTH, PADDLE_HEIGHT),
 				paddleImage,
-				inputListener);
+				inputListener,
+				windowDimensions);
 		paddle.setCenter(new Vector2(
 				windowDimensions.x() / 2,
 				windowDimensions.y() - PADDLE_DIST_FROM_BOTTOM));
@@ -323,10 +333,9 @@ public class BrickerGameManager extends GameManager {
 	 * Bricks are placed in a way that they do not check collisions
 	 * against each other.
 	 *
-	 * @param imageReader      used to load the brick image
-	 * @param windowDimensions the size of the game window
+	 * @param imageReader used to load the brick image
 	 */
-	private void createBricks(ImageReader imageReader,SoundReader soundReader, Vector2 windowDimensions) {
+	private void createBricks(ImageReader imageReader, SoundReader soundReader) {
 		Renderable brickImage = imageReader.readImage(BRICK_IMAGE, false);
 		Renderable puckImage = imageReader.readImage(PUCK_IMAGE,true);
 		Sound puckSound = soundReader.readSound(COLLISION_SOUND);
