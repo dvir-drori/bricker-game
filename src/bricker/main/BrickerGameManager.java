@@ -3,6 +3,7 @@ package bricker.main;
 import bricker.LivesCounter;
 import bricker.brick_strategies.BasicCollisionStrategy;
 import bricker.brick_strategies.CollisionStrategy;
+import bricker.brick_strategies.ExtraPaddleCollisionStrategy;
 import bricker.brick_strategies.PuckCollisionStrategy;
 import bricker.gameobjects.Ball;
 import bricker.gameobjects.Brick;
@@ -45,6 +46,7 @@ public class BrickerGameManager extends GameManager {
 	private static final int PADDLE_WIDTH            = 100;
 	private static final int PADDLE_HEIGHT           = 15;
 	private static final int PADDLE_DIST_FROM_BOTTOM = 30;
+	private static final double EXTRA_PADDLE_PROB = 0.2;
 
 	// ---- bricks ----
 	private static final int DEFAULT_BRICKS_PER_ROW = 8;
@@ -338,6 +340,7 @@ public class BrickerGameManager extends GameManager {
 	private void createBricks(ImageReader imageReader, SoundReader soundReader) {
 		Renderable brickImage = imageReader.readImage(BRICK_IMAGE, false);
 		Renderable puckImage = imageReader.readImage(PUCK_IMAGE,true);
+		Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE,true);
 		Sound puckSound = soundReader.readSound(COLLISION_SOUND);
 		Random random = new Random();
 
@@ -351,9 +354,13 @@ public class BrickerGameManager extends GameManager {
 				float y = BRICKS_TOP_OFFSET  + row * (BRICK_HEIGHT + BRICK_SPACING);
 
 				CollisionStrategy strategy;
-				if (random.nextDouble() < PUCK_BRICK_PROB){
+				double roll = random.nextDouble();
+				if (roll < PUCK_BRICK_PROB){
 					strategy = new PuckCollisionStrategy(gameObjects(), puckImage, puckSound, PUCK_SIZE, BALL_SPEED);
 
+				}
+				else if (roll < EXTRA_PADDLE_PROB){
+					strategy = new ExtraPaddleCollisionStrategy(gameObjects(), paddleImage,inputListener, new Vector2(PADDLE_WIDTH, PADDLE_HEIGHT), new Vector2(WINDOW_WIDTH, WINDOW_HEIGHT));
 				}
 				else{
 					strategy = new BasicCollisionStrategy(gameObjects());
