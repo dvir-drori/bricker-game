@@ -1,10 +1,7 @@
 package bricker.main;
 
 import bricker.LivesCounter;
-import bricker.brick_strategies.BasicCollisionStrategy;
-import bricker.brick_strategies.CollisionStrategy;
-import bricker.brick_strategies.ExtraPaddleCollisionStrategy;
-import bricker.brick_strategies.PuckCollisionStrategy;
+import bricker.brick_strategies.*;
 import bricker.gameobjects.Ball;
 import bricker.gameobjects.Brick;
 import bricker.gameobjects.GraphicLifeCounter;
@@ -79,6 +76,7 @@ public class BrickerGameManager extends GameManager {
 	private static final String COLLISION_SOUND  = "assets/blop.wav";
 	private static final String HEART_IMAGE = "assets/heart.png";
 	private static final String PUCK_IMAGE = "assets/mockBall.png";
+	private static final String EXPLOSION_SOUND = "assets/explosion.wav";
 
 	// ---- per-game configuration ----
 	private final int bricksPerRow;
@@ -341,8 +339,14 @@ public class BrickerGameManager extends GameManager {
 		Renderable brickImage = imageReader.readImage(BRICK_IMAGE, false);
 		Renderable puckImage = imageReader.readImage(PUCK_IMAGE,true);
 		Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE,true);
+		Renderable heartImage = imageReader.readImage(HEART_IMAGE, true);
+		Vector2 paddleDimensions = new Vector2(PADDLE_WIDTH, PADDLE_HEIGHT);
+		Vector2 heartDimensions = new Vector2(HEART_SIZE, HEART_SIZE);
 		Sound puckSound = soundReader.readSound(COLLISION_SOUND);
-		Random random = new Random();
+		Sound explosionSound = soundReader.readSound(EXPLOSION_SOUND);
+		CollisionStrategyFactory collisionStrategyFactory = new CollisionStrategyFactory(gameObjects(), puckImage,
+				puckSound, PUCK_SIZE, BALL_SPEED, paddleImage, inputListener, paddleDimensions, windowDimensions,
+				heartImage, heartDimensions, explosionSound);
 
 		float availableWidth = windowDimensions.x() - 2 * BRICKS_SIDE_OFFSET;
 		float totalSpacing   = BRICK_SPACING * (bricksPerRow - 1);
@@ -353,19 +357,19 @@ public class BrickerGameManager extends GameManager {
 				float x = BRICKS_SIDE_OFFSET + col * (brickWidth + BRICK_SPACING);
 				float y = BRICKS_TOP_OFFSET  + row * (BRICK_HEIGHT + BRICK_SPACING);
 
-				CollisionStrategy strategy;
-				double roll = random.nextDouble();
-				if (roll < PUCK_BRICK_PROB){
-					strategy = new PuckCollisionStrategy(gameObjects(), puckImage, puckSound, PUCK_SIZE, BALL_SPEED);
-
-				}
-				else if (roll < EXTRA_PADDLE_PROB){
-					strategy = new ExtraPaddleCollisionStrategy(gameObjects(), paddleImage,inputListener, new Vector2(PADDLE_WIDTH, PADDLE_HEIGHT), new Vector2(WINDOW_WIDTH, WINDOW_HEIGHT));
-				}
-				else{
-					strategy = new BasicCollisionStrategy(gameObjects());
-
-				}
+				CollisionStrategy strategy = collisionStrategyFactory.getNewCollision();
+//				double roll = random.nextDouble();
+//				if (roll < PUCK_BRICK_PROB){
+//					strategy = new PuckCollisionStrategy(gameObjects(), puckImage, puckSound, PUCK_SIZE, BALL_SPEED);
+//
+//				}
+//				else if (roll < EXTRA_PADDLE_PROB){
+//					strategy = new ExtraPaddleCollisionStrategy(gameObjects(), paddleImage,inputListener, new Vector2(PADDLE_WIDTH, PADDLE_HEIGHT), new Vector2(WINDOW_WIDTH, WINDOW_HEIGHT));
+//				}
+//				else{
+//					strategy = new BasicCollisionStrategy(gameObjects());
+//
+//				}
 
 				Brick brick = new Brick(
 						new Vector2(x, y),
