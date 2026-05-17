@@ -11,9 +11,13 @@ import danogl.util.Vector2;
  */
 
 public class Brick extends GameObject {
+	private static final int MAX_NUM_OF_NEIGHBORS = 4;
 	private final int row;
 	private final int col;
 	private final CollisionStrategy collisionStrategy;
+	private Brick[] neighborBricks;
+	private int lastNeighbor;
+	private boolean destroyed;
 
 	/**
 	 *
@@ -28,6 +32,9 @@ public class Brick extends GameObject {
 		super(topLeftCorner, dimensions, renderable);
 		this.col = col;
 		this.row = row;
+		this.neighborBricks = new Brick[MAX_NUM_OF_NEIGHBORS];
+		this.lastNeighbor = 0;
+		this.destroyed = false;
 		this.collisionStrategy = strategy;
 	}
 
@@ -38,7 +45,24 @@ public class Brick extends GameObject {
 	@Override
 	public void onCollisionEnter(GameObject other, Collision collision) {
 		super.onCollisionEnter(other, collision);
-		collisionStrategy.onCollision(this,other);
+		activateCollision(other);
+	}
+
+	public void activateCollision(GameObject other){
+		if (destroyed){
+			return;
+		}
+		destroyed = true;
+		collisionStrategy.onCollision(this, other);
+	}
+
+	public void addNeighbor(Brick neighbor){
+		neighborBricks[lastNeighbor] = neighbor;
+		lastNeighbor++;
+	}
+
+	public Brick[] getNeighborBricks(){
+		return this.neighborBricks;
 	}
 
 }

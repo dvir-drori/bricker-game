@@ -82,6 +82,7 @@ public class BrickerGameManager extends GameManager {
 	// ---- per-game configuration ----
 	private final int bricksPerRow;
 	private final int brickRows;
+	private final Brick[][] bricksGrid;
 
 	// ---- random ----
 	private Random random;
@@ -111,6 +112,7 @@ public class BrickerGameManager extends GameManager {
 		super(windowTitle, windowDimensions);
 		this.bricksPerRow = bricksPerRow;
 		this.brickRows    = brickRows;
+		this.bricksGrid = new Brick[brickRows][bricksPerRow];
 		this.random = new Random();
 	}
 
@@ -359,19 +361,6 @@ public class BrickerGameManager extends GameManager {
 				float y = BRICKS_TOP_OFFSET  + row * (BRICK_HEIGHT + BRICK_SPACING);
 
 				CollisionStrategy strategy = collisionStrategyFactory.getNewCollision();
-//				double roll = random.nextDouble();
-//				if (roll < PUCK_BRICK_PROB){
-//					strategy = new PuckCollisionStrategy(gameObjects(), puckImage, puckSound, PUCK_SIZE, BALL_SPEED);
-//
-//				}
-//				else if (roll < EXTRA_PADDLE_PROB){
-//					strategy = new ExtraPaddleCollisionStrategy(gameObjects(), paddleImage,inputListener, new Vector2(PADDLE_WIDTH, PADDLE_HEIGHT), new Vector2(WINDOW_WIDTH, WINDOW_HEIGHT));
-//				}
-//				else{
-//					strategy = new BasicCollisionStrategy(gameObjects());
-//
-//				}
-
 				Brick brick = new Brick(
 						new Vector2(x, y),
 						new Vector2(brickWidth, BRICK_HEIGHT),
@@ -379,6 +368,27 @@ public class BrickerGameManager extends GameManager {
 						row, col,
 						strategy);
 				gameObjects().addGameObject(brick, Layer.STATIC_OBJECTS);
+				bricksGrid[row][col] = brick;
+			}
+		}
+		for (int row = 0; row < brickRows; row++) {
+			for (int col = 0; col < bricksPerRow; col++) {
+				int i = row-1;
+				int j = col-1;
+				if (i>=0){
+					bricksGrid[row][col].addNeighbor(bricksGrid[i][col]);
+				}
+				if (j>=0){
+					bricksGrid[row][col].addNeighbor(bricksGrid[row][j]);
+				}
+				i+=2;
+				j+=2;
+				if (i<brickRows){
+					bricksGrid[row][col].addNeighbor(bricksGrid[i][col]);
+				}
+				if (j<bricksPerRow){
+					bricksGrid[row][col].addNeighbor(bricksGrid[row][j]);
+				}
 			}
 		}
 	}
