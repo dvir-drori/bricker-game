@@ -13,7 +13,7 @@ public class GraphicLifeCounter extends GameObject {
 	private final GameObjectCollection gameObjects;
 	private final Renderable heartImage;
 	private final int maxLives;
-	private final Heart[] hearts;
+	private final GameObject[] hearts;
 	private int currentDisplayedLives;
 
 	private static final int HEART_SIZE = 20;
@@ -44,7 +44,7 @@ public class GraphicLifeCounter extends GameObject {
 		this.gameObjects = gameObjects;
 		this.heartImage = heartImage;
 		this.maxLives = maxLives;
-		this.hearts = new Heart[maxLives];
+		this.hearts = new GameObject[maxLives];
 		this.currentDisplayedLives = 0;
 
 		for (int i = 0; i < livesCounter.getValue(); i++) {
@@ -55,7 +55,7 @@ public class GraphicLifeCounter extends GameObject {
 	private void addHeart() {
 		Vector2 position = new Vector2(startPosition.x() + currentDisplayedLives * (HEART_SIZE + HEART_SPACING), startPosition.y());
 
-		Heart heart = new Heart(position, new Vector2(HEART_SIZE,HEART_SIZE), heartImage);
+		GameObject heart = new GameObject(position, new Vector2(HEART_SIZE,HEART_SIZE), heartImage);
 		gameObjects.addGameObject(heart, Layer.UI);
 		hearts[currentDisplayedLives] = heart;
 		currentDisplayedLives++;

@@ -23,4 +23,5 @@ public class BasicCollisionStrategy implements CollisionStrategy{
 		gameObject.removeGameObject(brick, Layer.STATIC_OBJECTS);
 
 	}
+
 }

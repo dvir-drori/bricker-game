@@ -58,7 +58,8 @@ public class BrickerGameManager extends GameManager {
 	private static final double PUCK_BRICK_PROB = 0.1;
 
 	// --- heart ---
-	private static final int MAX_LIVES = 3;
+	private static final int INITIAL_LIVES = 3;
+	private static final int MAX_LIVES = 4;
 	private static final int HEART_SIZE = 20;
 	private static final int NUMERIC_COUNTER_SIZE = 20;
 	private static final int LIVES_LEFT_MARGIN = 20;
@@ -213,12 +214,12 @@ public class BrickerGameManager extends GameManager {
 		gameObjects().layers().shouldLayersCollide(
 				Layer.DEFAULT, Layer.STATIC_OBJECTS, true);
 
+		this.livesCounter = new LivesCounter(INITIAL_LIVES);
 		createBackground(imageReader);
 		createWalls();
 		createBall(imageReader, soundReader);
 		createPaddle(imageReader, inputListener);
 		createBricks(imageReader, soundReader);
-		this.livesCounter = new LivesCounter(MAX_LIVES);
 		createLivesDisplay(imageReader, windowDimensions);
 	}
 
@@ -346,7 +347,7 @@ public class BrickerGameManager extends GameManager {
 		Sound explosionSound = soundReader.readSound(EXPLOSION_SOUND);
 		CollisionStrategyFactory collisionStrategyFactory = new CollisionStrategyFactory(gameObjects(), puckImage,
 				puckSound, PUCK_SIZE, BALL_SPEED, paddleImage, inputListener, paddleDimensions, windowDimensions,
-				heartImage, heartDimensions, explosionSound);
+				heartImage, heartDimensions, explosionSound, livesCounter, MAX_LIVES);
 
 		float availableWidth = windowDimensions.x() - 2 * BRICKS_SIDE_OFFSET;
 		float totalSpacing   = BRICK_SPACING * (bricksPerRow - 1);

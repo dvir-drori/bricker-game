@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
  * a paddle class
  */
 public class Paddle extends GameObject {
+	public static final String MAIN_PADDLE_TAG = "MainPaddle";
 	private static final float MOVEMENT_SPEED = 300;
 
 
@@ -24,6 +25,7 @@ public class Paddle extends GameObject {
 		super(topLeftCorner, dimensions, renderable);
 		this.inputListener = inputListener;
 		this.windowDimensions = windowDimensions;
+		setTag(MAIN_PADDLE_TAG);
 	}
 
 	/**

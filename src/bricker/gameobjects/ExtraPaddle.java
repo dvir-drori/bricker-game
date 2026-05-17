@@ -8,6 +8,7 @@ import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 
 public class ExtraPaddle extends Paddle{
+	public static final String EXTRA_PADDLE_TAG = "ExtraPaddle";
 
 
 	private final GameObjectCollection gameObjects;
@@ -21,6 +22,7 @@ public class ExtraPaddle extends Paddle{
 
 		this.maxHits = maxHits;
 		this.hitsTaken = 0;
+		setTag(EXTRA_PADDLE_TAG);
 	}
 
 	/**
