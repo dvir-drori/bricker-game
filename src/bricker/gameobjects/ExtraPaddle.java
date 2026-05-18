@@ -14,6 +14,9 @@ import danogl.util.Vector2;
  * game once it reaches the maximum allowed number of hits.
  */
 public class ExtraPaddle extends Paddle{
+	/**
+	 * tag of extra paddle
+	 */
 	public static final String EXTRA_PADDLE_TAG = "ExtraPaddle";
 
 	private final GameObjectCollection gameObjects;

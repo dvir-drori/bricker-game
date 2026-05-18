@@ -13,9 +13,12 @@ import java.awt.event.KeyEvent;
  * game window boundaries.
  */
 public class Paddle extends GameObject {
+	/**
+	 * tag of main paddle
+	 */
 	public static final String MAIN_PADDLE_TAG = "MainPaddle";
-	private static final float MOVEMENT_SPEED = 300;
 
+	private static final float MOVEMENT_SPEED = 300;
 	private UserInputListener inputListener;
 	private final Vector2 windowDimensions;
 
