@@ -8,17 +8,26 @@ import danogl.util.Vector2;
 import java.awt.event.KeyEvent;
 
 /**
- * a paddle class
+ * Represents the player-controlled paddle in the game.
+ * The paddle responds to keyboard input and moves horizontally within the
+ * game window boundaries.
  */
 public class Paddle extends GameObject {
 	public static final String MAIN_PADDLE_TAG = "MainPaddle";
 	private static final float MOVEMENT_SPEED = 300;
 
-
-
 	private UserInputListener inputListener;
 	private final Vector2 windowDimensions;
 
+	/**
+	 * Constructs a new Paddle instance.
+	 *
+	 * @param topLeftCorner     Initial position of the paddle.
+	 * @param dimensions        Size of the paddle.
+	 * @param renderable        Image of the paddle.
+	 * @param inputListener     Handles keyboard input for movement.
+	 * @param windowDimensions  Size of the game window (used for boundary constraints).
+	 */
 	public Paddle(Vector2 topLeftCorner, Vector2 dimensions,
 				  Renderable renderable, UserInputListener inputListener,
 				  Vector2 windowDimensions) {
@@ -29,8 +38,9 @@ public class Paddle extends GameObject {
 	}
 
 	/**
-	 * moving the paddle
-	 * @param deltaTime
+	 * Updates the paddle each frame based on user input.
+	 *
+	 * @param deltaTime Time elapsed since last frame (in seconds).
 	 */
 	@Override
 	public void update(float deltaTime) {
@@ -49,8 +59,5 @@ public class Paddle extends GameObject {
 		if (getTopLeftCorner().x() + getDimensions().x()>windowDimensions.x()){
 			setTopLeftCorner(new Vector2(windowDimensions.x()-getDimensions().x(), getTopLeftCorner().y()) );
 		}
-
-
 	}
-
 }

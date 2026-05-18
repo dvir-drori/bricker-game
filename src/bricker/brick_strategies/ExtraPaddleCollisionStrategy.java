@@ -7,31 +7,37 @@ import danogl.GameObject;
 import danogl.collisions.GameObjectCollection;
 import danogl.collisions.Layer;
 import danogl.gui.UserInputListener;
-import danogl.gui.WindowController;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 
+/**
+ * A collision strategy that spawns an ExtraPaddle when a brick is destroyed.
+ * When the brick is hit, it is removed from the game. If no extra paddle currently exists,
+ * a new ExtraPaddle is spawned in the center of the screen. This paddle behaves like
+ * the main paddle but has a limited number of hits before disappearing.
+ */
 public class ExtraPaddleCollisionStrategy implements CollisionStrategy{
+
+	private static final int MAX_HITS = 4;
+
 	private final GameObjectCollection gameObjects;
 	private final Renderable paddleImage;
 	private final UserInputListener inputListener;
 	private final Vector2 paddleDimensions;
-	private static final int MAX_HITS = 4;
 	private final Vector2 windowDimensions;
 
 	/**
-	 * removes the brick we hit, and making an extra paddle that moves with the original one.
-	 * there can be only one extra paddle in a given time.
-	 * @param gameObjects
-	 * @param paddleImage
-	 * @param inputListener
-	 * @param paddleDimensions
-	 * @param windowDimensions
+	 * Constructs a collision strategy that may spawn an extra paddle.
+	 *
+	 * @param gameObjects        The game object collection used to manage objects in the game.
+	 * @param paddleImage        Image of the extra paddle.
+	 * @param inputListener      Handles keyboard input for paddle movement.
+	 * @param paddleDimensions   Size of the paddle to be spawned.
+	 * @param windowDimensions   Size of the game window.
 	 */
 	public ExtraPaddleCollisionStrategy(GameObjectCollection gameObjects, Renderable paddleImage,
 										UserInputListener inputListener,
-										Vector2 paddleDimensions, Vector2 windowDimensions
-	) {
+										Vector2 paddleDimensions, Vector2 windowDimensions) {
 		this.gameObjects = gameObjects;
 		this.paddleImage = paddleImage;
 
@@ -42,9 +48,12 @@ public class ExtraPaddleCollisionStrategy implements CollisionStrategy{
 	}
 
 	/**
-	 * dilling with the collision
-	 * @param brick
-	 * @param object
+	 * Handles collision by removing the brick and optionally spawning an extra paddle.
+	 * <p>
+	 * Only one extra paddle can exist at a time. if one already exists, nothing is spawned.
+	 *
+	 * @param brick  The brick that was hit.
+	 * @param object The object that collided with the brick.
 	 */
 	@Override
 	public void onCollision(Brick brick, GameObject object) {
@@ -53,16 +62,13 @@ public class ExtraPaddleCollisionStrategy implements CollisionStrategy{
 		if (extraPaddleExist()){
 			return;
 		}
-		Paddle extraPaddle = new ExtraPaddle(Vector2.ZERO, paddleDimensions, paddleImage, inputListener, windowDimensions, gameObjects,MAX_HITS);
+		Paddle extraPaddle = new ExtraPaddle(Vector2.ZERO, paddleDimensions,
+									paddleImage, inputListener, windowDimensions,
+									gameObjects,MAX_HITS);
 		extraPaddle.setCenter(windowDimensions.mult(0.5f));
 		gameObjects.addGameObject(extraPaddle);
-
 	}
 
-	/**
-	 * checks if extra paddle already exist
-	 * @return true if exists, false else
-	 */
 
 	private boolean extraPaddleExist() {
 		for(GameObject object : gameObjects){

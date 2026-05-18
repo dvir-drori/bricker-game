@@ -1,13 +1,23 @@
 package bricker.gameobjects;
 
-import bricker.LivesCounter;
+import bricker.main.LivesCounter;
 import danogl.GameObject;
 import danogl.collisions.GameObjectCollection;
 import danogl.collisions.Layer;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
 
+/**
+ * A graphical UI component that visually represents the player's remaining lives using heart icons.
+ * <p>
+ * Hearts are added or removed dynamically based on the current life count,
+ * up to a predefined maximum.
+ */
 public class GraphicLifeCounter extends GameObject {
+
+	private static final int HEART_SIZE = 20;
+	private static final int HEART_SPACING = 5;
+
 	private final Vector2 startPosition;
 	private final LivesCounter livesCounter;
 	private final GameObjectCollection gameObjects;
@@ -16,25 +26,17 @@ public class GraphicLifeCounter extends GameObject {
 	private final GameObject[] hearts;
 	private int currentDisplayedLives;
 
-	private static final int HEART_SIZE = 20;
-	private static final int HEART_SPACING = 5;
-
 
 	/**
-	 * @param deltaTime
+	 * Constructs a graphical life counter.
+	 *
+	 * @param startPosition  Starting position of the first heart icon.
+	 * @param dimensions     Placeholder dimensions for the UI element.
+	 * @param livesCounter   Shared counter tracking the player's lives.
+	 * @param heartImage     Image used to render each heart icon.
+	 * @param gameObjects    Collection managing all active game objects.
+	 * @param maxLives       Maximum number of lives to display.
 	 */
-	@Override
-	public void update(float deltaTime) {
-		super.update(deltaTime);
-		int curLives = livesCounter.getValue();
-		while (curLives < currentDisplayedLives){
-			removeHeart();
-		}
-		while (currentDisplayedLives < curLives && currentDisplayedLives < maxLives){
-			addHeart();
-		}
-	}
-
 	public GraphicLifeCounter(Vector2 startPosition, Vector2 dimensions, LivesCounter livesCounter,
 							  Renderable heartImage,GameObjectCollection gameObjects, int maxLives
 							  ) {
@@ -52,6 +54,25 @@ public class GraphicLifeCounter extends GameObject {
 		}
 	}
 
+	/**
+	 * Adds or removes heart icons so that the visual display always reflects
+	 * the number of lives.
+	 *
+	 * @param deltaTime Time elapsed since last frame.
+	 */
+	@Override
+	public void update(float deltaTime) {
+		super.update(deltaTime);
+		int curLives = livesCounter.getValue();
+		while (curLives < currentDisplayedLives){
+			removeHeart();
+		}
+		while (currentDisplayedLives < curLives && currentDisplayedLives < maxLives){
+			addHeart();
+		}
+	}
+
+
 	private void addHeart() {
 		Vector2 position = new Vector2(startPosition.x() + currentDisplayedLives * (HEART_SIZE + HEART_SPACING), startPosition.y());
 
@@ -61,11 +82,10 @@ public class GraphicLifeCounter extends GameObject {
 		currentDisplayedLives++;
 	}
 
+
 	private void removeHeart() {
 		currentDisplayedLives--;
 		gameObjects.removeGameObject(hearts[currentDisplayedLives],Layer.UI);
 		hearts[currentDisplayedLives] = null;
 	}
-
-
 }

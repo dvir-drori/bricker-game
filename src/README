@@ -1,0 +1,33 @@
+dvir.assaf, dvir.drori
+211378773, 208028118
+
+1. We chose to pass the value returned by gameObject() as a parameter to the constructor of BasicCollisionStrategy.
+pros : simpler code, no extra public methods, direct removal of bricks by the strategy
+cons : the instance of gameObject() allows the strategy to access all objects in the game, which has a potential
+       to cause harm if misused by the strategy.
+
+2. We added a class that holds the value of lives remaining, and 2 more subclasses of GameObject that represents
+the numeric and graphic representation of the lives remaining. Each is responsible to display its own representation.
+
+3. we added a factory class that is responsible to create random strategy according to the instructions.
+Each strategy is represented by a class that implements the CollisionStrategy interface.
+All behaviors are implemented mainly in the onCollision() method, but each has distinct fields and methods to operate.
+Explosion - remove the brick and play the explosion sound, uses activateCollision() method of neighbor bricks to remove
+the neighbors.
+ExtraLife - gets the parameters needed to create a heart object in the constructor, then remove the brick and create
+the heart according to the instructions
+ExtraPaddle - remove the brick and create an extra paddle. We added an ExtraPaddle subclass of Paddle with distinct
+behavior to achieve the correct behavior.
+Puck - remove the brick and create 2 Pucks with random directions. we added Puck subclass of Ball with distinct
+behavior to achieve the correct behavior.
+
+4. The double behavior is represented bt the DoubleCollisionStrategy class which receives an array of strategies.
+Upon collision, it executes all the strategies 1 by 1, adding the brick back into the game to prevent collision with
+a removed object. When all strategies are done being executed, removes the brick permanently.
+We used an array to allow the option of secondary double behavior. The array is created in the factory, which restricts
+the maximum number of behaviors to 3.
+
+5. We added public methods activateCollision(), addNeighbor(), getNeighborBricks(), to the Brick class in order to
+implement the explosion strategy.
+We also added class for each collision strategy, and for the factory.
+And all the classes mentioned above.

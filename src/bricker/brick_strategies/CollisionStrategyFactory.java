@@ -1,17 +1,22 @@
 package bricker.brick_strategies;
 
-import bricker.LivesCounter;
+import bricker.main.LivesCounter;
 import danogl.collisions.GameObjectCollection;
 import danogl.gui.Sound;
 import danogl.gui.UserInputListener;
 import danogl.gui.rendering.Renderable;
 import danogl.util.Vector2;
-
 import java.util.Random;
 
+/**
+ * Factory responsible for creating random collision strategy instances for bricks.
+ * <p>
+ * This class encapsulates the logic for assigning different behaviors to bricks.
+ */
 public class CollisionStrategyFactory {
 	private static final int NUM_OF_OPTIONS = 5;
 	private static final int SECOND_TIME = 4;
+	private static final int MAX_NUM_OF_STRATEGIES = 3;
 
 	private GameObjectCollection gameObject;
 	private Renderable puckImage;
@@ -29,8 +34,24 @@ public class CollisionStrategyFactory {
 	private int maxLives;
 	private Random random;
 
-	private static final int MAX_NUM_OF_STRATEGIES = 3;
-
+	/**
+	 * Constructs a factory for generating collision strategies.
+	 *
+	 * @param gameObject        The game object collection used to manage objects in the game.
+	 * @param puckImage         Image of pucks.
+	 * @param puckSound         Sound played by pucks.
+	 * @param puckSize          Size of spawned pucks.
+	 * @param puckSpeed         Speed of spawned pucks.
+	 * @param paddleImage       Image of extra paddle.
+	 * @param inputListener     Handles user input for paddle movement.
+	 * @param paddleDimensions  Dimensions of the extra paddle.
+	 * @param windowDimensions  Game window size.
+	 * @param heartImage        Image of hearts.
+	 * @param heartDimensions   Size of hearts.
+	 * @param explosionSound    Sound played during explosion effects.
+	 * @param livesCounter      Shared lives counter.
+	 * @param maxLives          Maximum number of allowed lives.
+	 */
 	public CollisionStrategyFactory(GameObjectCollection gameObject,
 									Renderable puckImage, Sound puckSound, float puckSize,
 									float puckSpeed,
@@ -56,15 +77,20 @@ public class CollisionStrategyFactory {
 
 	}
 
-	public CollisionStrategy getNewCollision(){
+	/**
+	 * Returns a randomly selected collision strategy.
+	 *
+	 * @return A new collision strategy instance.
+	 */
+	public CollisionStrategy getNewCollisionStrategy(){
 
 		if (random.nextBoolean()){
 			return new BasicCollisionStrategy(gameObject);
 		}
-		return buildRandomStrategy();
+		return buildRandomSpecialStrategy();
 	}
 
-	private CollisionStrategy buildRandomStrategy() {
+	private CollisionStrategy buildRandomSpecialStrategy() {
 		int roll = random.nextInt(NUM_OF_OPTIONS);
 		switch (roll) {
 		case 0:
@@ -94,7 +120,7 @@ public class CollisionStrategyFactory {
 				else {
 					strategyNum = random.nextInt(SECOND_TIME);
 				}
-				strategies[j] = randomStrategy(strategyNum);
+				strategies[j] = randomStrategyNoDouble(strategyNum);
 				j++;
 				i--;
 			}
@@ -105,7 +131,7 @@ public class CollisionStrategyFactory {
 		}
 	}
 
-	private CollisionStrategy randomStrategy(int strategyNum) {
+	private CollisionStrategy randomStrategyNoDouble(int strategyNum) {
 		return switch (strategyNum) {
 			case 0 -> new PuckCollisionStrategy(gameObject, puckImage, puckSound, puckSize, puckSpeed);
 			case 1 ->

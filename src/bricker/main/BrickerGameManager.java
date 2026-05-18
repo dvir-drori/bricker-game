@@ -1,6 +1,5 @@
 package bricker.main;
 
-import bricker.LivesCounter;
 import bricker.brick_strategies.*;
 import bricker.gameobjects.Ball;
 import bricker.gameobjects.Brick;
@@ -30,6 +29,8 @@ import java.util.Random;
 public class BrickerGameManager extends GameManager {
 
 
+	// ---- constants ----
+
 	// ---- window ----
 	private static final String WINDOW_TITLE  = "Bricker";
 	private static final int    WINDOW_WIDTH  = 700;
@@ -43,28 +44,26 @@ public class BrickerGameManager extends GameManager {
 	private static final int PADDLE_WIDTH            = 100;
 	private static final int PADDLE_HEIGHT           = 15;
 	private static final int PADDLE_DIST_FROM_BOTTOM = 30;
-	private static final double EXTRA_PADDLE_PROB = 0.2;
 
 	// ---- bricks ----
 	private static final int DEFAULT_BRICKS_PER_ROW = 8;
-	private static final int DEFAULT_BRICK_ROWS    = 7;
-	private static final int BRICK_HEIGHT          = 15;
-	private static final int BRICK_SPACING         = 5;
-	private static final int BRICKS_TOP_OFFSET     = 15;
-	private static final int BRICKS_SIDE_OFFSET    = 10;
+	private static final int DEFAULT_BRICK_ROWS     = 7;
+	private static final int BRICK_HEIGHT           = 15;
+	private static final int BRICK_SPACING          = 5;
+	private static final int BRICKS_TOP_OFFSET      = 15;
+	private static final int BRICKS_SIDE_OFFSET     = 10;
 
 	// --- pucks ---
 	private static final int PUCK_SIZE = 15;
-	private static final double PUCK_BRICK_PROB = 0.1;
 
 	// --- heart ---
-	private static final int INITIAL_LIVES = 3;
-	private static final int MAX_LIVES = 4;
-	private static final int HEART_SIZE = 20;
+	private static final int INITIAL_LIVES        = 3;
+	private static final int MAX_LIVES            = 4;
+	private static final int HEART_SIZE           = 20;
 	private static final int NUMERIC_COUNTER_SIZE = 20;
-	private static final int LIVES_LEFT_MARGIN = 20;
-	private static final int LIVES_BOTTOM_MARGIN = 25;
-	private static final int LIVES_GAP = 10;
+	private static final int LIVES_LEFT_MARGIN    = 20;
+	private static final int LIVES_BOTTOM_MARGIN  = 25;
+	private static final int LIVES_GAP            = 10;
 
 	// ---- walls ----
 	private static final int WALL_WIDTH = 10;
@@ -75,9 +74,15 @@ public class BrickerGameManager extends GameManager {
 	private static final String BRICK_IMAGE      = "assets/brick.png";
 	private static final String BACKGROUND_IMAGE = "assets/DARK_BG2_small.jpeg";
 	private static final String COLLISION_SOUND  = "assets/blop.wav";
-	private static final String HEART_IMAGE = "assets/heart.png";
-	private static final String PUCK_IMAGE = "assets/mockBall.png";
-	private static final String EXPLOSION_SOUND = "assets/explosion.wav";
+	private static final String HEART_IMAGE      = "assets/heart.png";
+	private static final String PUCK_IMAGE       = "assets/mockBall.png";
+	private static final String EXPLOSION_SOUND  = "assets/explosion.wav";
+
+	// --- prompts ---
+	private static final String LOSE_PROMPT = "You lose! Play again?";
+	private static final String WIN_PROMPT  = "You win! Play again?";
+
+	// ---- fields ----
 
 	// ---- per-game configuration ----
 	private final int bricksPerRow;
@@ -85,7 +90,7 @@ public class BrickerGameManager extends GameManager {
 	private final Brick[][] bricksGrid;
 
 	// ---- random ----
-	private Random random;
+	private final Random random;
 
 	// --- references ---
 	private GameObject ball;
@@ -93,11 +98,6 @@ public class BrickerGameManager extends GameManager {
 	private Vector2	windowDimensions;
 	private LivesCounter livesCounter;
 	private UserInputListener inputListener;
-
-
-	// --- prompts ---
-	private static final String LOSE_PROMPT = "You lose! Play again?";
-	private static final String WIN_PROMPT = "You win! Play again?";
 
 	/**
 	 * Constructs a new Bricker game manager.
@@ -131,7 +131,7 @@ public class BrickerGameManager extends GameManager {
 	 * Detects game-end conditions:
 	 *   if ball fell off the bottom and lives remain  decrement lives, reset ball.
 	 *   if ball fell off and no lives left you lose.
-	 *   all bricks are broken you win.
+	 *   if all bricks are broken you win.
 	 */
 	private void checkGameEnd() {
 		String prompt = "";
@@ -163,6 +163,7 @@ public class BrickerGameManager extends GameManager {
 			}
 		}
 	}
+
 	/**
 	 * Repositions the ball at the center of the screen and gives it
 	 * a new random velocity.
@@ -225,20 +226,6 @@ public class BrickerGameManager extends GameManager {
 		createLivesDisplay(imageReader, windowDimensions);
 	}
 
-	private void createLivesDisplay(ImageReader imageReader, Vector2 windowDimensions) {
-		Renderable heartImage = imageReader.readImage(HEART_IMAGE, true);
-
-		//numeric display
-		Vector2 numericPosition = new Vector2(LIVES_LEFT_MARGIN, windowDimensions.y() - LIVES_BOTTOM_MARGIN);
-		NumericLifeCounter numeric =  new NumericLifeCounter(numericPosition, new Vector2(NUMERIC_COUNTER_SIZE, NUMERIC_COUNTER_SIZE), livesCounter);
-		gameObjects().addGameObject(numeric,Layer.UI);
-
-		//graphic display
-		Vector2 graphicPosition = new Vector2(LIVES_LEFT_MARGIN + NUMERIC_COUNTER_SIZE + LIVES_GAP, windowDimensions.y() - LIVES_BOTTOM_MARGIN);
-		GraphicLifeCounter graphic = new GraphicLifeCounter(graphicPosition, new Vector2(HEART_SIZE, HEART_SIZE), livesCounter,heartImage, gameObjects(), MAX_LIVES);
-		gameObjects().addGameObject(graphic,Layer.UI);
-	}
-
 	/**
 	 * Creates the background image and adds it to the BACKGROUND layer
 	 * so it is drawn behind everything else.
@@ -284,25 +271,14 @@ public class BrickerGameManager extends GameManager {
 	private void createBall(ImageReader imageReader,
 							SoundReader soundReader) {
 		Renderable ballImage   = imageReader.readImage(BALL_IMAGE, true);
-		Sound      collideSound = soundReader.readSound(COLLISION_SOUND);
+		Sound collideSound = soundReader.readSound(COLLISION_SOUND);
 
 		this.ball = new Ball(
 				Vector2.ZERO,
 				new Vector2(BALL_SIZE, BALL_SIZE),
 				ballImage,
 				collideSound);
-		ball.setCenter(windowDimensions.mult(0.5f));
-
-		// Random initial direction: up-left, up-right, down-left, down-right
-		float ballVelY = BALL_SPEED;
-		float ballVelX = BALL_SPEED;
-		if (random.nextBoolean()){
-			ballVelX *= -1;
-		}
-		if (random.nextBoolean()){
-			ballVelY *= -1;
-		}
-		ball.setVelocity(new Vector2(ballVelX, ballVelY));
+		resetBall();
 		gameObjects().addGameObject(ball);
 	}
 
@@ -337,20 +313,11 @@ public class BrickerGameManager extends GameManager {
 	 * against each other.
 	 *
 	 * @param imageReader used to load the brick image
+	 * @param soundReader used to load sounds
 	 */
 	private void createBricks(ImageReader imageReader, SoundReader soundReader) {
+		CollisionStrategyFactory collisionStrategyFactory = createFactory(imageReader, soundReader);
 		Renderable brickImage = imageReader.readImage(BRICK_IMAGE, false);
-		Renderable puckImage = imageReader.readImage(PUCK_IMAGE,true);
-		Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE,true);
-		Renderable heartImage = imageReader.readImage(HEART_IMAGE, true);
-		Vector2 paddleDimensions = new Vector2(PADDLE_WIDTH, PADDLE_HEIGHT);
-		Vector2 heartDimensions = new Vector2(HEART_SIZE, HEART_SIZE);
-		Sound puckSound = soundReader.readSound(COLLISION_SOUND);
-		Sound explosionSound = soundReader.readSound(EXPLOSION_SOUND);
-		CollisionStrategyFactory collisionStrategyFactory = new CollisionStrategyFactory(gameObjects(), puckImage,
-				puckSound, PUCK_SIZE, BALL_SPEED, paddleImage, inputListener, paddleDimensions, windowDimensions,
-				heartImage, heartDimensions, explosionSound, livesCounter, MAX_LIVES);
-
 		float availableWidth = windowDimensions.x() - 2 * BRICKS_SIDE_OFFSET;
 		float totalSpacing   = BRICK_SPACING * (bricksPerRow - 1);
 		float brickWidth     = (availableWidth - totalSpacing) / bricksPerRow;
@@ -360,7 +327,7 @@ public class BrickerGameManager extends GameManager {
 				float x = BRICKS_SIDE_OFFSET + col * (brickWidth + BRICK_SPACING);
 				float y = BRICKS_TOP_OFFSET  + row * (BRICK_HEIGHT + BRICK_SPACING);
 
-				CollisionStrategy strategy = collisionStrategyFactory.getNewCollision();
+				CollisionStrategy strategy = collisionStrategyFactory.getNewCollisionStrategy();
 				Brick brick = new Brick(
 						new Vector2(x, y),
 						new Vector2(brickWidth, BRICK_HEIGHT),
@@ -371,6 +338,33 @@ public class BrickerGameManager extends GameManager {
 				bricksGrid[row][col] = brick;
 			}
 		}
+		defineBrickNeighbors();
+	}
+
+	/**
+	 * Creates the collisions strategy factory
+	 * @param imageReader used to load images of game objects
+	 * @param soundReader used to load sounds of collisions
+	 * @return factory for collision strategies
+	 */
+	private CollisionStrategyFactory createFactory(ImageReader imageReader, SoundReader soundReader) {
+		Renderable puckImage = imageReader.readImage(PUCK_IMAGE,true);
+		Renderable paddleImage = imageReader.readImage(PADDLE_IMAGE,true);
+		Renderable heartImage = imageReader.readImage(HEART_IMAGE, true);
+		Vector2 paddleDimensions = new Vector2(PADDLE_WIDTH, PADDLE_HEIGHT);
+		Vector2 heartDimensions = new Vector2(HEART_SIZE, HEART_SIZE);
+		Sound puckSound = soundReader.readSound(COLLISION_SOUND);
+		Sound explosionSound = soundReader.readSound(EXPLOSION_SOUND);
+		return new CollisionStrategyFactory(gameObjects(), puckImage,
+				puckSound, PUCK_SIZE, BALL_SPEED, paddleImage, inputListener, paddleDimensions, windowDimensions,
+				heartImage, heartDimensions, explosionSound, livesCounter, MAX_LIVES);
+	}
+
+	/**
+	 * Define the neighbors of all bricks in the game
+	 * each brick neighbors are the surrounding bricks, without diagonals
+	 */
+	private void defineBrickNeighbors() {
 		for (int row = 0; row < brickRows; row++) {
 			for (int col = 0; col < bricksPerRow; col++) {
 				int i = row-1;
@@ -394,8 +388,41 @@ public class BrickerGameManager extends GameManager {
 	}
 
 	/**
-	 * optional adding cmd arguments
-	 * @param args command-line arguments: optionally, {@code bricksPerRow} and {@code brickRows}
+	 * Creates and initializes the visual display representing the player's remaining lives.
+	 * The display is positioned relative to the game window dimensions and uses the provided
+	 * image resource for rendering the life icons.
+	 *
+	 * @param imageReader      The image reader used to load the life icon image.
+	 * @param windowDimensions The dimensions of the game window.
+	 */
+	private void createLivesDisplay(ImageReader imageReader, Vector2 windowDimensions) {
+		Renderable heartImage = imageReader.readImage(HEART_IMAGE, true);
+
+		//numeric display
+		Vector2 numericPosition = new Vector2(LIVES_LEFT_MARGIN, windowDimensions.y() - LIVES_BOTTOM_MARGIN);
+		NumericLifeCounter numeric =  new NumericLifeCounter(numericPosition,
+				new Vector2(NUMERIC_COUNTER_SIZE, NUMERIC_COUNTER_SIZE),
+				livesCounter);
+		gameObjects().addGameObject(numeric,Layer.UI);
+
+		//graphic display
+		Vector2 graphicPosition = new Vector2(LIVES_LEFT_MARGIN + NUMERIC_COUNTER_SIZE + LIVES_GAP,
+											  windowDimensions.y() - LIVES_BOTTOM_MARGIN);
+		GraphicLifeCounter graphic = new GraphicLifeCounter(graphicPosition,
+															new Vector2(HEART_SIZE, HEART_SIZE),
+															livesCounter,heartImage, gameObjects(), MAX_LIVES);
+		gameObjects().addGameObject(graphic,Layer.UI);
+	}
+
+	/**
+	 * Launches the Bricker game.
+	 * The program optionally accepts two command-line arguments:
+	 * the number of bricks per row and the number of brick rows.
+	 * If no arguments are provided, default values are used.
+	 *
+	 * @param args Command-line arguments:
+	 *             {@code args[0]} - number of bricks per row,
+	 *             {@code args[1]} - number of brick rows.
 	 */
 	public static void main(String[] args) {
 		int bricksPerRow;
