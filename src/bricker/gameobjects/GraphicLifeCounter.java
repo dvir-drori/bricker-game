@@ -74,8 +74,8 @@ public class GraphicLifeCounter extends GameObject {
 
 
 	private void addHeart() {
-		Vector2 position = new Vector2(startPosition.x() + currentDisplayedLives * (HEART_SIZE + HEART_SPACING), startPosition.y());
-
+		Vector2 position = new Vector2(startPosition.x() +
+				currentDisplayedLives * (HEART_SIZE + HEART_SPACING), startPosition.y());
 		GameObject heart = new GameObject(position, new Vector2(HEART_SIZE,HEART_SIZE), heartImage);
 		gameObjects.addGameObject(heart, Layer.UI);
 		hearts[currentDisplayedLives] = heart;

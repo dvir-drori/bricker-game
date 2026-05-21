@@ -33,8 +33,8 @@ public class PuckCollisionStrategy implements CollisionStrategy{
 	 * @param puckSize    Size (width/height) of each puck.
 	 * @param ballSpeed   Initial speed assigned to spawned pucks.
 	 */
-	public PuckCollisionStrategy(GameObjectCollection gameObject, Renderable puckImage, Sound puckSound, float puckSize,
-								 float ballSpeed) {
+	public PuckCollisionStrategy(GameObjectCollection gameObject, Renderable puckImage,
+								 Sound puckSound, float puckSize, float ballSpeed) {
 		this.gameObject = gameObject;
 		this.puckImage = puckImage;
 		this.puckSound = puckSound;

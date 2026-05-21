@@ -96,7 +96,8 @@ public class CollisionStrategyFactory {
 		case 0:
 			return new PuckCollisionStrategy(gameObject, puckImage, puckSound, puckSize, puckSpeed);
 		case 1:
-			return new ExtraPaddleCollisionStrategy(gameObject, paddleImage, inputListener, paddleDimensions, windowDimensions);
+			return new ExtraPaddleCollisionStrategy(gameObject, paddleImage, inputListener,
+					paddleDimensions, windowDimensions);
 		case 2:
 			return new ExtraLifeCollisionStrategy(gameObject, heartImage, heartDimensions,
 					livesCounter, maxLives, windowDimensions.y());
@@ -135,7 +136,8 @@ public class CollisionStrategyFactory {
 		return switch (strategyNum) {
 			case 0 -> new PuckCollisionStrategy(gameObject, puckImage, puckSound, puckSize, puckSpeed);
 			case 1 ->
-					new ExtraPaddleCollisionStrategy(gameObject, paddleImage, inputListener, paddleDimensions, windowDimensions);
+					new ExtraPaddleCollisionStrategy(gameObject, paddleImage, inputListener,
+							paddleDimensions, windowDimensions);
 			case 2 -> new ExtraLifeCollisionStrategy(gameObject, heartImage, heartDimensions,
 					livesCounter, maxLives, windowDimensions.y());
 			case 3 -> new ExplosionCollisionStrategy(gameObject, explosionSound);

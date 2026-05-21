@@ -356,8 +356,8 @@ public class BrickerGameManager extends GameManager {
 		Sound puckSound = soundReader.readSound(COLLISION_SOUND);
 		Sound explosionSound = soundReader.readSound(EXPLOSION_SOUND);
 		return new CollisionStrategyFactory(gameObjects(), puckImage,
-				puckSound, PUCK_SIZE, BALL_SPEED, paddleImage, inputListener, paddleDimensions, windowDimensions,
-				heartImage, heartDimensions, explosionSound, livesCounter, MAX_LIVES);
+				puckSound, PUCK_SIZE, BALL_SPEED, paddleImage, inputListener, paddleDimensions,
+				windowDimensions, heartImage, heartDimensions, explosionSound, livesCounter, MAX_LIVES);
 	}
 
 	/**
@@ -410,7 +410,8 @@ public class BrickerGameManager extends GameManager {
 											  windowDimensions.y() - LIVES_BOTTOM_MARGIN);
 		GraphicLifeCounter graphic = new GraphicLifeCounter(graphicPosition,
 															new Vector2(HEART_SIZE, HEART_SIZE),
-															livesCounter,heartImage, gameObjects(), MAX_LIVES);
+															livesCounter, heartImage, gameObjects(),
+															MAX_LIVES);
 		gameObjects().addGameObject(graphic,Layer.UI);
 	}
 
